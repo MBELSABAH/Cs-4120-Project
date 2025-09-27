@@ -1,0 +1,34 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.log
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- OS / IDE junk ---
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# --- Data (don’t commit raw datasets) ---
+data/*
+!data/README.md   # keep only the instruction file
+
+# --- Models / artifacts ---
+models/*
+!models/.gitkeep  # optional, to keep folder visible
+
+# --- MLflow tracking ---
+mlruns/
+
+# --- Environments ---
+.env
+.venv/
+venv/
+env/
