@@ -55,5 +55,13 @@ Our project builds predictive models that support both **diagnosis** (classifica
 - **Data Handling:** Raw dataset is excluded from version control. Instructions are provided so anyone can download it.  
 - **Determinism:** Random seeds will be fixed for reproducibility.  
 
+
+## 🚀 How to Run
+
+After setting up your environment (`pip install -r requirements.txt`):
+
+- Train classical ML baselines:  
+  ```bash
+  python src/train_baselines.py
 ---
 
