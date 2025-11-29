@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import (accuracy_score, f1_score, mean_absolute_error,
-                             mean_squared_error, roc_auc_score)
+                             root_mean_squared_error, roc_auc_score)
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
@@ -137,12 +137,12 @@ def train_regressors(df: pd.DataFrame, outdir: str, seed: int = 42, y_var: str =
             # Validation metrics
             yv_hat = pipe.predict(Xv)
             mae_v = mean_absolute_error(yv, yv_hat)
-            rmse_v = mean_squared_error(yv, yv_hat, squared=False)
+            rmse_v = root_mean_squared_error(yv, yv_hat)
 
             # Test metrics
             yt_hat = pipe.predict(Xt)
             mae_t = mean_absolute_error(yt, yt_hat)
-            rmse_t = mean_squared_error(yt, yt_hat, squared=False)
+            rmse_t = root_mean_squared_error(yt, yt_hat)
 
             mlflow.log_metric("mae_val", mae_v)
             mlflow.log_metric("rmse_val", rmse_v)

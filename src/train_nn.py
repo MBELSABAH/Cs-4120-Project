@@ -15,7 +15,7 @@ import pandas as pd
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
-from sklearn.metrics import accuracy_score, f1_score, mean_absolute_error, mean_squared_error
+from sklearn.metrics import accuracy_score, f1_score, mean_absolute_error, root_mean_squared_error
 
 from data import load_and_clean, make_stratified_splits
 from features import build_preprocessor
@@ -132,7 +132,7 @@ def _run_epoch_reg(model, loader, criterion, optimizer, device, train: bool):
     targets = torch.cat(all_targets, dim=0).numpy().ravel()
 
     mae = mean_absolute_error(targets, preds)
-    rmse = mean_squared_error(targets, preds, squared=False)
+    rmse = root_mean_squared_error(targets, preds)
     return avg_loss, mae, rmse
 
 
