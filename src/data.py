@@ -15,6 +15,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from features import add_engineered_features
+
 
 def _load_raw(csv_path: str) -> pd.DataFrame:
     df = pd.read_csv(csv_path)
@@ -52,6 +54,8 @@ def load_and_clean(csv_path: str) -> pd.DataFrame:
     for c in ["sex", "cp", "fbs", "restecg", "exang", "slope", "thal"]:
         if c in df.columns:
             df[c] = df[c].astype(int)
+
+    df = add_engineered_features(df)
 
     return df
 

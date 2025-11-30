@@ -6,12 +6,40 @@ We keep the numeric / categorical split fixed across all experiments and
 wrap it in a ColumnTransformer so that the same preprocessing is reused
 for classical models and neural networks.
 """
+import numpy as np
+import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-# Numeric and categorical column groups in the cleaned heart dataset
-NUM_COLS = ["age", "trestbps", "chol", "thalach", "oldpeak", "ca"]
-CAT_COLS = ["sex", "cp", "fbs", "restecg", "exang", "slope", "thal"]
+# Base numeric and categorical columns from the cleaned heart dataset
+BASE_NUM_COLS = ["age", "trestbps", "chol", "thalach", "oldpeak", "ca"]
+BASE_CAT_COLS = ["sex", "cp", "fbs", "restecg", "exang", "slope", "thal"]
+
+# Engineered features shared by all experiments
+ENGINEERED_NUM_COLS = ["bp_chol_ratio", "stress_index"]
+ENGINEERED_CAT_COLS = ["age_band"]
+
+NUM_COLS = BASE_NUM_COLS + ENGINEERED_NUM_COLS
+CAT_COLS = BASE_CAT_COLS + ENGINEERED_CAT_COLS
+
+
+def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Create reproducible engineered features used by every model."""
+    df = df.copy()
+
+    # Ratio of cholesterol to resting blood pressure (guard against zero/NaN)
+    safe_trestbps = df["trestbps"].replace(0, np.nan)
+    df["bp_chol_ratio"] = (df["chol"] / safe_trestbps).fillna(0.0)
+
+    # Simple stress indicator: ST depression scaled by exercise-induced angina flag
+    df["stress_index"] = df["oldpeak"] * (1 + df["exang"])
+
+    # Age bucket for categorical risk-group modelling
+    bins = [0, 40, 50, 60, 70, 200]
+    labels = ["<40", "40-49", "50-59", "60-69", "70+"]
+    df["age_band"] = pd.cut(df["age"], bins=bins, labels=labels, right=False).astype(str)
+
+    return df
 
 
 def build_preprocessor(scale_numeric: bool = True, drop_cols=None) -> ColumnTransformer:
@@ -40,7 +68,6 @@ def build_preprocessor(scale_numeric: bool = True, drop_cols=None) -> ColumnTran
     cat = [c for c in CAT_COLS if c not in drop]
 
     numeric_tf = StandardScaler() if scale_numeric and len(num) > 0 else "passthrough"
-    # Make OHE dense so it’s easy to feed into PyTorch
     categorical_tf = OneHotEncoder(handle_unknown="ignore") if len(cat) > 0 else "drop"
 
     pre = ColumnTransformer(
